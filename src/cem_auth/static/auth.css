@@ -1,0 +1,25 @@
+/* cem-auth's own pages when the host app does not render them in its shell. Light and dark. */
+:root{--bg:#f3f5f7;--panel:#fff;--line:#d9e0e6;--text:#13202b;--muted:#5a6b79;--accent:#0b6fa0;--ok:#18804d;--bad:#c42b3b;--m:1.05rem;--s:.85rem}
+@media (prefers-color-scheme:dark){:root{--bg:#0b131b;--panel:#121d28;--line:#263849;--text:#e9f1f7;--muted:#8fa4b6;--accent:#59c3ff;--ok:#56e39f;--bad:#ff697c}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+header b{font-size:1.05rem}header a{color:var(--accent)}header form{display:inline}
+main{max-width:1100px;margin:0 auto;padding:16px}
+a{color:var(--accent)}h1{font-size:1.4rem;margin:0 0 10px}h2{font-size:1.15rem;margin:0 0 8px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;margin:0 0 14px}
+.login{max-width:440px}.login label,.entry label{display:grid;gap:4px;margin:0 0 10px}
+input,select,textarea{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--text)}
+button.go,.go{font:inherit;font-weight:600;padding:8px 14px;border-radius:6px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer}
+button.link{background:none;border:0;color:var(--accent);text-decoration:underline;cursor:pointer;font:inherit;padding:0}
+.hint{color:var(--muted);font-size:var(--s)}.msg{padding:8px 12px;border-radius:6px;border:1px solid var(--line)}.msg.ok{border-color:var(--ok)}.msg.bad{border-color:var(--bad);color:var(--bad)}
+table{border-collapse:collapse;width:100%}th,td{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left}
+.row{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.scroll{overflow-x:auto}.inline{display:inline}.chk{display:flex;gap:6px;align-items:center}
+.qr{display:inline-block}.qr svg{display:block;width:240px;height:240px;background:#fff;border-radius:8px}
+code.link{word-break:break-all}
+.loginhelp{max-width:860px}.loginhelp summary{cursor:pointer;font-weight:600;font-size:var(--m);color:var(--accent)}
+.loginhelp[open] summary{margin-bottom:6px}.loginhelp h3{margin:16px 0 4px;font-size:var(--m)}
+.loginhelp ol,.loginhelp ul{margin:4px 0;padding-left:22px}.loginhelp li{margin:3px 0}
+.lh-row{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:16px;align-items:start}
+.lh-img img{width:100%;height:auto;border:1px solid var(--line);border-radius:8px;display:block}
+@media (max-width:720px){.lh-row{grid-template-columns:1fr}.lh-img{max-width:280px}}

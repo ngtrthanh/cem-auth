@@ -1,0 +1,21 @@
+{% extends "base.html" %}{% block title %}Sign in{% endblock %}
+{% block main %}
+<form class="card login" method="post" action="{{ '/login/code' if step == 'code' else '/login' }}">
+  <h1>Sign in</h1>
+  {% if step == 'code' %}
+  <label>Code from your authenticator<input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="7" required autofocus></label>
+  <button class="go">Sign in</button>
+  <p class="hint">On an iPhone with the code in Passwords, Safari offers it above the keyboard.</p>
+  {% else %}
+  <label>Username<input name="username" autocomplete="username" required autofocus></label>
+  <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+  <button class="go">Next</button>
+  <p class="or">or</p>
+  <button type="button" class="go" id="passkey-signin">Sign in with a passkey</button>
+  <p class="msg bad" id="passkey-err" role="alert" hidden></p>
+  <p class="hint">A passkey is Face ID or Touch ID instead of the password and code. Add one on your account page after signing in. No account? An Admin sends you an enrolment link.</p>
+  {% endif %}
+</form>
+{% from "_login_help_vi.html" import help with context %}{{ help('staff') }}
+<script src="{{ static('passkey.js') }}" defer></script>
+{% endblock %}

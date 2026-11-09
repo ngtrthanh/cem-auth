@@ -1,0 +1,41 @@
+[project]
+name = "cem-auth"
+version = "0.1.0"
+description = "Staff sign-in for cem-os apps: password + TOTP or passkeys, EdDSA JWT with rotating refresh, audit log, users page"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "jinja2>=3.1",
+    "itsdangerous>=2.2",
+    "python-multipart>=0.0.9",
+    "pydantic-settings>=2.4",
+    "sqlalchemy>=2.0",
+    "psycopg[binary]>=3.2",
+    "pyjwt[crypto]>=2.9",
+    "cryptography>=43",
+    "pyotp>=2.9",
+    "segno>=1.6",
+    "webauthn>=2.2",
+]
+
+[dependency-groups]
+dev = ["pytest>=8", "httpx>=0.27", "cbor2>=5.6", "ruff>=0.6"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cem_auth"]
+
+[tool.ruff]
+line-length = 120
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["B008"]  # FastAPI: Depends() in defaults is the idiom
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

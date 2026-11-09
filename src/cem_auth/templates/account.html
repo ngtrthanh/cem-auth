@@ -1,0 +1,34 @@
+{% extends "base.html" %}{% block title %}Your account{% endblock %}
+{% block main %}
+<section class="card login">
+  <h1>Your account</h1>
+  <p>{{ me.name }} · <b>{{ me.username }}</b></p>
+
+  <h2>Passkeys</h2>
+  <p class="hint">A passkey signs you in with Face ID or Touch ID: no password, no code. It stays on your device (an iPhone keeps it in iCloud Keychain, so your other Apple devices have it too). Your password and code keep working.</p>
+  {% if keys %}
+  <table>
+    <thead><tr><th>Name</th><th>Added</th><th>Last used</th><th></th></tr></thead>
+    <tbody>{% for k in keys %}
+      <tr><td>{{ k.name }}{% if k.backed_up %} <span class="hint">(synced)</span>{% endif %}</td>
+        <td>{{ k.created_at.strftime('%d %b %Y') }}</td>
+        <td>{{ k.last_used_at.strftime('%d %b %Y %H:%M') if k.last_used_at else '-' }}</td>
+        <td><form method="post" action="/account/passkeys/{{ k.id.hex() }}/delete" onsubmit="return confirm('Remove this passkey?')"><button class="link">Remove</button></form></td></tr>
+    {% endfor %}</tbody>
+  </table>
+  {% else %}
+  <p><b>No passkey yet.</b> Add one below to sign in with one tap next time.</p>
+  {% endif %}
+
+  {% if recent %}
+  <label>Name for this device<input id="passkey-name" maxlength="60" value="{{ device }}"></label>
+  <button type="button" class="go" id="passkey-add">Add a passkey on this device</button>
+  {% else %}
+  <p class="msg">To add a passkey, <b>sign out and sign in again</b> first: a passkey can only be added within 15 minutes of signing in.</p>
+  {% endif %}
+  <p class="msg bad" id="passkey-err" role="alert" hidden></p>
+  {% if next %}<p><a href="{{ next }}">Not now, go on →</a></p>{% endif %}
+  <p class="hint">Lost your phone? Tell the Admin at once: a reset removes all your passkeys.</p>
+</section>
+<script src="{{ static('passkey.js') }}" defer></script>
+{% endblock %}

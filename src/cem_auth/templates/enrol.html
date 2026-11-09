@@ -1,0 +1,23 @@
+{% extends "base.html" %}{% block title %}Enrol{% endblock %}
+{% block main %}
+{% if not u %}
+<section class="card"><h1>This link is not valid</h1><p>{{ err or 'It was used already or has expired. Ask an Admin for a new one.' }}</p></section>
+{% else %}
+<form class="card login" method="post" action="/enrol/{{ tok }}">
+  <h1>Set up your account</h1>
+  <p>{{ u.name }} · <b>{{ u.username }}</b></p>
+  <h2>1. Choose a password</h2>
+  {# the username, so a password manager saves the new password with it (and with the code from step 2) #}
+  <label>Username<input name="username" autocomplete="username" value="{{ u.username }}" readonly></label>
+  <label>Password (at least 12 characters)<input name="password" type="password" autocomplete="new-password" minlength="12" required></label>
+  <label>Again<input name="password2" type="password" autocomplete="new-password" minlength="12" required></label>
+  <h2>2. Add the account to an authenticator</h2>
+  <p class="hint">On this phone: tap the code. An iPhone offers to keep it in Passwords (Safari then fills the code in for you); Android opens your authenticator app. From a computer: scan it with your phone's camera or authenticator app.</p>
+  <a class="qr" href="{{ uri }}" aria-label="Add to an authenticator">{{ qr|safe }}</a>
+  <details><summary>Can't scan?</summary><p class="hint">Enter this key in the app: <code>{{ secret }}</code></p></details>
+  <h2>3. Enter the code it shows</h2>
+  <label>Code<input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="7" required></label>
+  <button class="go">Finish</button>
+</form>
+{% endif %}
+{% endblock %}

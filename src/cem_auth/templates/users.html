@@ -1,0 +1,54 @@
+{% extends "base.html" %}{% block title %}Staff users{% endblock %}
+{% macro roleform(have) %}{% set by = {} %}{% for r in have or [] %}{% set _ = by.update({r.role: r}) %}{% endfor %}
+<table class="roles"><thead><tr><th>Role</th><th title="Stored now, enforced in phase 2">Line</th><th title="Stored now, enforced in phase 2">Material</th><th title="May use the port pages">Port</th></tr></thead><tbody>
+{% for role in roles %}{% set h = by.get(role) %}<tr>
+  <td><label class="chk"><input type="checkbox" name="role:{{ role }}" {{ 'checked' if h }}> {{ role }}</label></td>
+  <td><select name="line:{{ role }}">{% for x in lines %}<option {{ 'selected' if h and h.line == x }}>{{ x }}</option>{% endfor %}</select></td>
+  <td><select name="material:{{ role }}">{% for x in materials %}<option {{ 'selected' if h and h.material == x }}>{{ x }}</option>{% endfor %}</select></td>
+  <td><input type="checkbox" name="port:{{ role }}" {{ 'checked' if not h or h.port }} aria-label="port"></td></tr>
+{% endfor %}</tbody></table>{% endmacro %}
+{% block main %}
+{% if off %}<section class="card"><h1>Staff users</h1><p>Staff accounts are used only with local sign-in; this server signs in with <b>{{ off }}</b>.</p></section>{% else %}
+<section class="card">
+  <h1>Staff users</h1>
+  <p class="hint">Create an account and hand the person its one-time enrolment link (valid {{ hours }} h, works once, shown once): on it they choose a password and add the account to an authenticator. Reset sends someone through enrolment again (a lost phone: their sessions and passkeys end). Disable ends their sessions. Every change is in the audit log under your name.</p>
+  {% if not recent %}<p class="msg bad">To change users, sign out and sign in again: changes need a sign-in within the last 15 minutes.</p>{% endif %}
+</section>
+{% if shown %}
+<section class="card enrol-link"><h2>Enrolment link for {{ shown.user.name }} · {{ shown.user.username }} ({{ shown.what }})</h2>
+  <div class="row"><a class="qr" href="{{ shown.link }}" aria-label="Enrolment link as a QR code">{{ qr|safe }}</a>
+    <div><p><code class="link" id="enrol-link">{{ shown.link }}</code></p>
+      <p><button class="go" type="button" onclick="navigator.clipboard.writeText(document.getElementById('enrol-link').textContent).then(() => this.textContent = 'Copied')">Copy link</button></p>
+      <p class="hint">Shown once: it is not kept anywhere. Give it to the person directly (their own phone can scan the code from this screen), not in a group chat. If it is lost, Reset makes a new one.</p></div></div>
+</section>
+{% endif %}
+<form class="card entry" method="post" action="/users">
+  <h2>New user</h2>
+  <div class="grid">
+    <label>Username<input name="username" required autocomplete="off" placeholder="e.g. thanh.nguyen"></label>
+    <label>Full name<input name="name" required autocomplete="off"></label>
+  </div>
+  {{ roleform(None) }}
+  <button class="go" name="action" value="create" {{ 'disabled' if not recent }}>Create and show the link</button>
+</form>
+<section class="card scroll"><h2>Users ({{ rows|length }})</h2><table>
+  <thead><tr><th>Username</th><th>Name</th><th>State</th><th>Passkeys</th><th>Roles</th><th>Created</th><th></th></tr></thead>
+  <tbody>{% for u in rows %}
+  <tr><td><b>{{ u.username }}</b>{% if u.username == (user.id or '')[6:] %} <small class="hint">(you)</small>{% endif %}</td><td>{{ u.name }}</td>
+    <td>{% if u.disabled %}✕ disabled{% elif u.active %}✓ active{% else %}… not enrolled yet{% endif %}{% if u.locked_until %} · waiting until {{ u.locked_until.strftime('%H:%M') }}{% endif %}</td>
+    <td>{{ u.passkeys }}</td>
+    <td>{% for r in u.roles %}{{ r.role }}{% if r.line != 'All' or r.material != 'All' %} <small class="hint">{{ r.line }}/{{ r.material }}</small>{% endif %}{% if not r.port %} <small class="hint">no port</small>{% endif %}{{ ', ' if not loop.last }}{% endfor %}</td>
+    <td>{{ u.created_at.strftime('%d %b %Y') }}</td>
+    <td><details class="useredit"><summary>Change</summary>
+      <form method="post" action="/users"><input type="hidden" name="id" value="{{ u.id }}">{{ roleform(u.roles) }}
+        <button class="go" name="action" value="roles" {{ 'disabled' if not recent }}>Save roles</button></form>
+      <form class="inline" method="post" action="/users"><input type="hidden" name="id" value="{{ u.id }}">
+        <button class="go" name="action" value="reset" {{ 'disabled' if not recent }} onclick="return confirm('Reset {{ u.username }}? Their password, code, passkeys and sessions end; a new enrolment link is shown.')">Reset</button>
+        {% if u.disabled %}<button class="go" name="action" value="enable" {{ 'disabled' if not recent }}>Enable</button>{% else %}<button class="go" name="action" value="disable" {{ 'disabled' if not recent }} onclick="return confirm('Disable {{ u.username }}? Their sessions end.')">Disable</button>{% endif %}</form>
+    </details></td></tr>
+  {% else %}<tr><td colspan="7" class="hint">No users yet.</td></tr>{% endfor %}</tbody>
+</table></section>
+{% if log %}<section class="card scroll"><h2>Recent changes</h2><table><thead><tr><th>When</th><th>By</th><th>What</th><th>User</th></tr></thead><tbody>
+{% for x in log %}<tr><td>{{ x.at.strftime('%d %b %H:%M') }}</td><td>{{ x.actor }}</td><td>{{ x.action }}</td><td>{{ x.who }}</td></tr>{% endfor %}</tbody></table></section>{% endif %}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,51 @@
+{# Hướng dẫn đăng nhập bằng tiếng Việt, ngay dưới ô đăng nhập. The pictures are screens with made-up accounts; the
+   QR codes in them are covered, so nobody scans a test account into their app. kind "staff" only in this package
+   (the supplier variant stays in the host app). #}
+{% macro step(img, alt) %}<a class="lh-img" href="{{ static('help/' ~ img ~ '.png') }}" target="_blank" rel="noopener"><img src="{{ static('help/' ~ img ~ '.png') }}" alt="{{ alt }}" loading="lazy"></a>{% endmacro %}
+{% macro help(kind) %}{% set s = kind == 'supplier' %}
+<details class="card loginhelp" lang="vi">
+  <summary>📖 Hướng dẫn đăng nhập (Tiếng Việt)</summary>
+
+  <h3>Lần đầu: tạo tài khoản</h3>
+  <div class="lh-row"><div>
+    <p>{{ 'Cảng' if s else 'Admin' }} gửi bạn một <b>link tạo tài khoản</b>. Link chỉ dùng được <b>1 lần</b>, trong <b>{{ '72' if s else '24' }} giờ</b>. Không chuyển link cho người khác.</p>
+    <ol>
+      <li><b>Cài app xác thực</b> trên điện thoại:
+        <ul><li>iPhone: dùng sẵn app <b>Mật khẩu</b> (Passwords), không cần cài thêm.</li>
+            <li>Android: cài <b>Google Authenticator</b> hoặc <b>Microsoft Authenticator</b>.</li></ul></li>
+      <li>Mở link. Đặt <b>mật khẩu từ 12 ký tự</b> trở lên, gõ lại lần 2 cho khớp.</li>
+      <li><b>Thêm tài khoản vào app xác thực:</b>
+        <ul><li>Mở link trên điện thoại: <b>chạm vào mã QR</b>.</li>
+            <li>Mở link trên máy tính: dùng app xác thực trên điện thoại <b>quét mã QR</b>.</li></ul>
+        App sẽ có mục <b>{{ cfg.issuer }}</b>, hiện <b>6 số</b> đổi mỗi 30 giây.</li>
+      <li>Nhập 6 số đó, bấm <b>{{ 'Finish set-up' if s else 'Finish' }}</b>.</li>
+    </ol></div>{{ step('su_setup' if s else 'st_enrol', 'Trang tạo tài khoản') }}</div>
+
+  <h3>Hằng ngày: đăng nhập</h3>
+  <div class="lh-row"><div><ol>
+      <li>Mở <b>{{ cfg.public_url }}</b>.</li>
+      <li>Nhập <b>{{ 'email' if s else 'tên đăng nhập' }}</b> và <b>mật khẩu</b>, bấm <b>Next</b>.</li>
+    </ol></div>{{ step('su_login' if s else 'st_login', 'Bước 1: email/tên đăng nhập và mật khẩu') }}</div>
+  <div class="lh-row"><div><ol start="3">
+      <li>Mở app xác thực, xem <b>6 số</b> của mục <b>{{ cfg.issuer }}</b>, nhập vào và bấm <b>Sign in</b>.
+        <br><small>iPhone dùng app Mật khẩu: Safari tự gợi ý mã ngay trên bàn phím.</small></li>
+    </ol></div>{{ step('su_code' if s else 'st_code', 'Bước 2: mã 6 số') }}</div>
+
+  <h3>Nhanh hơn: đăng nhập bằng Face ID / vân tay (passkey)</h3>
+  <div class="lh-row"><div><ol>
+      <li>Đăng nhập xong lần đầu, app mở trang <b>{{ 'Passkeys' if s else 'Your account' }}</b>. Bấm <b>Add a passkey on this device</b>, rồi xác nhận bằng Face ID hoặc vân tay.</li>
+      <li>Từ lần sau: bấm <b>Sign in with a passkey</b>, rồi Face ID hoặc vân tay. <b>Không cần gõ gì.</b></li>
+    </ol>
+    <p><small>Mỗi điện thoại hoặc máy tính thêm passkey một lần. iPhone, iPad và Mac dùng chung Apple ID thì dùng chung passkey. Mật khẩu và mã 6 số vẫn dùng được như cũ.</small></p>
+    </div>{{ step('su_account' if s else 'st_account', 'Thêm passkey') }}</div>
+
+  <h3>Gặp lỗi</h3>
+  <ul>
+    <li><b>Báo sai:</b> kiểm tra lại {{ 'email' if s else 'tên đăng nhập' }} và mật khẩu, rồi dùng <b>mã mới</b> (mỗi mã chỉ dùng được 1 lần).
+      {% if s %}Sai 5 lần thì tài khoản bị khoá 15 phút.{% else %}Sai nhiều lần phải đợi từ 1 đến 15 phút rồi thử lại.{% endif %}</li>
+    <li><b>Mã luôn bị báo sai:</b> giờ trên điện thoại bị lệch. Bật chế độ đặt giờ tự động.</li>
+    <li><b>Mất điện thoại, đổi điện thoại hoặc quên mật khẩu:</b> báo {{ 'cảng' if s else 'Admin' }} để <b>Reset</b>. Bạn sẽ nhận link mới và làm lại phần "Lần đầu".</li>
+    <li><b>Không ai được hỏi mật khẩu hay mã 6 số của bạn</b>, kể cả {{ 'cảng' if s else 'Admin hay IT' }}.</li>
+  </ul>
+</details>
+{% endmacro %}

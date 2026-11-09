@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{% endblock %} · {{ cfg.issuer }}</title>
+<link rel="stylesheet" href="{{ static('auth.css') }}">{% block head %}{% endblock %}</head>
+<body>
+<header><b>{{ cfg.issuer }}</b>{% if user and user.id.startswith('staff:') %}<span><a href="/account">{{ user.name }}</a>{% if user.can(host_users_perm) %} · <a href="/users">Staff users</a>{% endif %} · <form method="post" action="/logout"><button class="link">Sign out</button></form></span>{% endif %}</header>
+<main>
+{% if request.query_params.get('msg') %}<p class="msg ok" role="status">{{ request.query_params.get('msg') }}</p>{% endif %}
+{% if request.query_params.get('err') and not err is defined %}<p class="msg bad" role="alert">{{ request.query_params.get('err') }}</p>{% endif %}
+{% block main %}{% endblock %}
+</main></body></html>
